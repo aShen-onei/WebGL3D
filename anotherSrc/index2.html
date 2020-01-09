@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        html, body {
+            margin: 0;
+            height: 100%;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+</body>
+<script src="three.js/build/three.js"></script>
+<script src="three.js/examples/js/loaders/ColladaLoader.js"></script>
+<script src="three.js/examples/js/controls/OrbitControls.js"></script>
+<script src="three.js/examples/js/controls/TrackballControls.js"></script>
+<script>
+    // 初始化三大件
+    let renderer = new THREE.WebGLRenderer({antialias: true});
+    let   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 1000);
+    let    scene = new THREE.Scene();
+    // 初始化性能监视器
+    // let    stats = new Stats();
+    // 初始化交互控件
+    let  control = new THREE.TrackballControls(camera, renderer.domElement);
+    function initTHREE() {
+      // initStats();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      // 阴影效果
+      renderer.setClearColor(0xffffff);
+      document.body.appendChild(renderer.domElement);
+    }
+
+    function initCamera() {
+      camera.position.set(40, 40, 50);
+      // camera.lookAt(new THREE.Vector3(0, 0, 0));
+    }
+
+    // let gui = {};
+    // function initGui() {
+    //   let datGUI = new dat.GUI();
+    // }
+
+    function initLights() {
+      let environmentLight = new THREE.AmbientLight(0xffffff);
+      scene.add(environmentLight);
+
+      let pointLight = new THREE.PointLight(0xffffff);
+      pointLight.position.set(0, 50, 0);
+      pointLight.castShadow = true;
+      scene.add(pointLight);
+    }
+    
+    function initObject() {
+      // 辅助器
+      let helper = new THREE.AxesHelper(50);
+      scene.add(helper);
+
+      let loader = new THREE.ColladaLoader();
+      let   mesh;
+      loader.load("../src/model/fishing&boat/model.dae", function (res) {
+        mesh = res.scene.children[0].clone();
+        scene.add(mesh)
+      })
+    }
+
+    function initStats() {
+      stats.domElement.style.position = 'absolute';
+      stats.domElement.style.top = '';
+      stats.domElement.style.right = '0px';
+      document.body.appendChild(stats.domElement)
+    }
+
+    function initControl() {
+      // 鼠标阻尼
+      // control.dampingFactor = 0.5;
+      // 缩放
+      // control.enableZoom = true;
+      // 旋转
+      // control.enableRotate = true;
+      // 自传
+      // control.autoRotate = true;
+      // 拖拽
+      // control.enablePan = true;
+      control.target.set(0,0,0)
+    }
+
+    function render() {
+      renderer.render(scene, camera)
+    }
+    
+    function onResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      render();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    
+    function animation() {
+      render();
+      // stats.update();
+      control.update();
+      requestAnimationFrame(animation);
+    }
+
+    function start() {
+      initTHREE();
+      initCamera();
+      initLights();
+      initObject();
+      initControl();
+      animation();
+      window.addEventListener('resize', onResize, false);
+    }
+    setTimeout(() => {
+      start()
+    }, 300)
+</script>
+</html>
